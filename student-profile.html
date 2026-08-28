@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>My Fees</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{background:#f5f7fb;color:#172033}
+.header{
+ height:64px;background:#fff;border-bottom:1px solid #e5e7eb;
+ display:flex;align-items:center;gap:10px;padding:0 14px;
+ position:sticky;top:0;z-index:10
+}
+.back{
+ width:38px;height:38px;border:0;border-radius:10px;
+ background:#eef2ff;color:#4f46e5;font-size:23px
+}
+.header h2{font-size:16px}
+.main{max-width:520px;margin:auto;padding:15px 14px 80px}
+.loading{text-align:center;padding:50px 10px;color:#64748b;font-size:10px}
+.error{
+ background:#fff;border-radius:14px;padding:25px;text-align:center;
+ color:#dc2626;font-size:10px;line-height:1.7
+}
+.profile{
+ background:#fff;border-radius:16px;padding:20px;text-align:center;
+ box-shadow:0 4px 18px #00000008
+}
+.avatar{
+ width:70px;height:70px;margin:auto;border-radius:20px;
+ background:#eef2ff;color:#4f46e5;display:flex;
+ align-items:center;justify-content:center;font-size:28px;font-weight:bold
+}
+.profile h1{font-size:19px;margin-top:10px}
+.profile p{color:#64748b;font-size:8px;margin-top:5px}
+.fees{
+ display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px
+}
+.fee{
+ background:#fff;border-radius:13px;padding:14px;
+ box-shadow:0 3px 15px #00000008
+}
+.full{grid-column:1/-1}
+.fee span{display:block;color:#64748b;font-size:8px}
+.fee b{display:block;margin-top:6px;font-size:17px}
+.paid{color:#15803d}
+.pending{color:#dc2626}
+.section{margin-top:17px}
+.title{font-size:13px;font-weight:bold;margin-bottom:9px}
+.contact,.history{
+ background:#fff;border-radius:14px;padding:13px;
+ box-shadow:0 3px 15px #00000008
+}
+.contactName{font-size:11px;font-weight:bold}
+.contactNo{font-size:8px;color:#64748b;margin-top:4px}
+.contactButtons{
+ display:grid;grid-template-columns:repeat(3,1fr);
+ gap:7px;margin-top:11px
+}
+.contactButtons button{
+ border:0;border-radius:9px;padding:11px 4px;font-size:8px;font-weight:bold
+}
+.call{background:#dcfce7;color:#15803d}
+.sms{background:#dbeafe;color:#1d4ed8}
+.whatsapp{background:#dcfce7;color:#15803d}
+.payment{
+ padding:13px 0;border-bottom:1px solid #edf0f5
+}
+.payment:last-child{border-bottom:0}
+.paymentTop{
+ display:flex;justify-content:space-between;gap:10px
+}
+.method{font-size:9px;font-weight:bold}
+.amount{font-size:12px;font-weight:bold;color:#15803d}
+.details{
+ margin-top:5px;color:#64748b;font-size:8px;line-height:1.7
+}
+.empty{text-align:center;padding:25px;color:#94a3b8;font-size:9px}
+.ad{
+ min-height:60px;display:flex;justify-content:center;
+ align-items:center;overflow:hidden;margin-top:16px
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+<button class="back" id="backBtn">‹</button>
+<h2>💳 My Fees</h2>
+</header>
+
+<main class="main">
+
+<div id="page">
+<div class="loading">💳 Fees details loading...</div>
+</div>
+
+<div class="ad">
+<script>
+atOptions = {
+ 'key' : '635d4ad3bf4bbbc0e74b26c08d4f41ad',
+ 'format' : 'iframe',
+ 'height' : 50,
+ 'width' : 320,
+ 'params' : {}
+};
+</script>
+<script src="https://www.highrevenueformat.com/635d4ad3bf4bbbc0e74b26c08d4f41ad/invoke.js"></script>
+</div>
+
+</main>
+
+<script type="module">
+
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+ getDatabase,
+ ref,
+ get
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+/* =========================
+ FIREBASE
+========================= */
+
+const firebaseConfig = {
+
+apiKey:
+"AIzaSyB4jh232r8NiNn3Z76pjsqZdJhOJjw5aN0",
+
+authDomain:
+"rajwada-coaching-classes.firebaseapp.com",
+
+databaseURL:
+"https://rajwada-coaching-classes-default-rtdb.firebaseio.com",
+
+projectId:
+"rajwada-coaching-classes",
+
+storageBucket:
+"rajwada-coaching-classes.firebasestorage.app",
+
+messagingSenderId:
+"370606048179",
+
+appId:
+"1:370606048179:web:89c5f886ec35f1971c01c6",
+
+measurementId:
+"G-4XL4VCPY1W"
+};
+
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const page = document.getElementById("page");
+
+const classId =
+localStorage.getItem("studentClassId");
+
+const studentId =
+localStorage.getItem("studentId");
+
+
+/* =========================
+ HELPERS
+========================= */
+
+function money(value){
+
+return "₹" +
+Number(value || 0)
+.toLocaleString("en-IN");
+
+}
+
+
+function safe(value){
+
+return String(value ?? "")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+
+function phoneNumber(value){
+
+return String(value || "")
+.replace(/\D/g,"");
+
+}
+
+
+/* =========================
+ ERROR
+========================= */
+
+function showError(message){
+
+page.innerHTML = `
+
+<div class="error">
+
+❌ ${safe(message)}
+
+<br><br>
+
+<button
+id="errorBack"
+style="
+border:0;
+background:#4f46e5;
+color:white;
+padding:10px 18px;
+border-radius:9px;
+font-size:9px;
+">
+
+Back
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById("errorBack")
+.onclick = () => {
+
+location.href = "student.html";
+
+};
+
+}
+
+
+/* =========================
+ LOAD DATA
+========================= */
+
+async function loadData(){
+
+try{
+
+if(!classId){
+
+showError(
+"Class select nahi hui. Pehle class search karein."
+);
+
+return;
+
+}
+
+
+if(!studentId){
+
+showError(
+"Student select nahi hua. Pehle apna naam search karein."
+);
+
+return;
+
+}
+
+
+/* CLASS */
+
+const classSnap = await get(
+ref(
+db,
+"classes/" + classId
+)
+);
+
+
+if(!classSnap.exists()){
+
+showError("Class Firebase mein nahi mili.");
+
+return;
+
+}
+
+
+const classData =
+classSnap.val();
+
+
+/* PROFILE */
+
+const profile =
+classData.profile || {};
+
+
+const className =
+profile.className ||
+profile.name ||
+"Coaching Classes";
+
+
+const sirName =
+profile.ownerName ||
+profile.owner ||
+profile.teacherName ||
+"Class";
+
+
+const sirPhone =
+profile.mobile ||
+profile.phone ||
+profile.whatsapp ||
+profile.contactNumber ||
+"";
+
+
+/* STUDENT */
+
+const students =
+classData.students || {};
+
+
+const student =
+students[studentId];
+
+
+if(!student){
+
+showError(
+"Student nahi mila."
+);
+
+return;
+
+}
+
+
+/* =========================
+ TOTAL FEES
+========================= */
+
+const totalFees = Number(
+student.totalFees ??
+student.fees ??
+student.total ??
+0
+);
+
+
+/* =========================
+ PAYMENT HISTORY
+========================= */
+
+const paymentsObject =
+student.payments || {};
+
+const payments = [];
+
+
+Object.entries(paymentsObject)
+.forEach(([id,p]) => {
+
+if(!p) return;
+
+const amount =
+Number(
+p.amount ??
+p.paid ??
+p.value ??
+0
+);
+
+
+payments.push({
+
+id:id,
+
+amount:amount,
+
+date:
+p.date ||
+p.paymentDate ||
+"",
+
+time:
+p.time ||
+p.paymentTime ||
+"",
+
+method:
+p.method ||
+p.paymentMethod ||
+p.mode ||
+"Cash"
+
+});
+
+});
+
+
+/* =========================
+ PAID FIX
+========================= */
+
+/*
+ Payment history ke saare
+ payments ko add kiya ja raha hai.
+*/
+
+let paidFromHistory = 0;
+
+payments.forEach(p => {
+
+paidFromHistory +=
+Number(p.amount || 0);
+
+});
+
+
+/*
+ Agar history mein payment hai
+ to wahi actual Paid amount hoga.
+
+ Agar history empty hai to
+ saved paidAmount use hoga.
+*/
+
+const savedPaid =
+Number(
+student.paidAmount ??
+student.paid ??
+0
+);
+
+
+const paid =
+paidFromHistory > 0
+?
+paidFromHistory
+:
+savedPaid;
+
+
+/* =========================
+ REMAINING
+========================= */
+
+const remaining =
+Math.max(
+totalFees - paid,
+0
+);
+
+
+/* =========================
+ SORT HISTORY
+========================= */
+
+payments.sort((a,b) => {
+
+const dateA =
+String(a.date) +
+" " +
+String(a.time);
+
+const dateB =
+String(b.date) +
+" " +
+String(b.time);
+
+return dateB.localeCompare(dateA);
+
+});
+
+
+render(
+student,
+className,
+sirName,
+sirPhone,
+totalFees,
+paid,
+remaining,
+payments
+);
+
+
+}catch(error){
+
+console.error(error);
+
+showError(
+"Data load nahi hua: " +
+error.message
+);
+
+}
+
+}
+
+
+/* =========================
+ RENDER
+========================= */
+
+function render(
+student,
+className,
+sirName,
+sirPhone,
+totalFees,
+paid,
+remaining,
+payments
+){
+
+let historyHTML = "";
+
+
+if(payments.length){
+
+historyHTML =
+payments.map(p => `
+
+<div class="payment">
+
+<div class="paymentTop">
+
+<div>
+
+<div class="method">
+
+💳 ${safe(
+p.method
+)}
+
+</div>
+
+<div class="details">
+
+📅 Date:
+${safe(
+p.date || "-"
+)}
+
+<br>
+
+🕐 Time:
+${safe(
+p.time || "-"
+)}
+
+</div>
+
+</div>
+
+<div class="amount">
+
++ ${money(p.amount)}
+
+</div>
+
+</div>
+
+</div>
+
+`).join("");
+
+}else{
+
+historyHTML = `
+
+<div class="empty">
+
+📜 Abhi koi payment history nahi hai.
+
+</div>
+
+`;
+
+}
+
+
+page.innerHTML = `
+
+<div class="profile">
+
+<div class="avatar">
+
+${safe(
+(student.name || "S")
+.charAt(0)
+.toUpperCase()
+)}
+
+</div>
+
+<h1>
+${safe(student.name || "Student")}
+</h1>
+
+<p>
+🎓 ${safe(className)}
+</p>
+
+</div>
+
+
+<div class="fees">
+
+<div class="fee full">
+
+<span>
+Total Fees
+</span>
+
+<b>
+${money(totalFees)}
+</b>
+
+</div>
+
+
+<div class="fee">
+
+<span>
+Paid
+</span>
+
+<b class="paid">
+${money(paid)}
+</b>
+
+</div>
+
+
+<div class="fee">
+
+<span>
+Remaining
+</span>
+
+<b class="pending">
+${money(remaining)}
+</b>
+
+</div>
+
+</div>
+
+
+<section class="section">
+
+<div class="title">
+📞 Class Contact
+</div>
+
+<div class="contact">
+
+<div class="contactName">
+${safe(sirName)}
+</div>
+
+<div class="contactNo">
+
+${
+sirPhone
+?
+safe(sirPhone)
+:
+"Contact number available nahi hai"
+}
+
+</div>
+
+
+<div class="contactButtons">
+
+<button
+class="call"
+id="callBtn">
+
+📞 Call
+
+</button>
+
+
+<button
+class="sms"
+id="smsBtn">
+
+💬 SMS
+
+</button>
+
+
+<button
+class="whatsapp"
+id="whatsappBtn">
+
+🟢 WhatsApp
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section class="section">
+
+<div class="title">
+📜 Complete Payment History
+</div>
+
+<div class="history">
+
+${historyHTML}
+
+</div>
+
+</section>
+
+`;
+
+
+/* =========================
+ CALL
+========================= */
+
+document.getElementById(
+"callBtn"
+).onclick = () => {
+
+const number =
+phoneNumber(sirPhone);
+
+if(!number){
+
+alert(
+"Class ka mobile number available nahi hai."
+);
+
+return;
+
+}
+
+location.href =
+"tel:" + number;
+
+};
+
+
+/* =========================
+ SMS
+========================= */
+
+document.getElementById(
+"smsBtn"
+).onclick = () => {
+
+const number =
+phoneNumber(sirPhone);
+
+if(!number){
+
+alert(
+"Class ka mobile number available nahi hai."
+);
+
+return;
+
+}
+
+const text =
+"Namaste " +
+sirName +
+", main " +
+(student.name || "student") +
+" hoon. Mujhe fees ke baare mein baat karni hai.";
+
+location.href =
+"sms:" +
+number +
+"?body=" +
+encodeURIComponent(text);
+
+};
+
+
+/* =========================
+ WHATSAPP
+========================= */
+
+document.getElementById(
+"whatsappBtn"
+).onclick = () => {
+
+let number =
+phoneNumber(sirPhone);
+
+if(!number){
+
+alert(
+"Class ka WhatsApp number available nahi hai."
+);
+
+return;
+
+}
+
+
+/*
+ India number
+*/
+
+if(number.length === 10){
+
+number =
+"91" + number;
+
+}
+
+
+const text =
+"Namaste " +
+sirName +
+", main " +
+(student.name || "student") +
+" hoon. Mujhe apni fees ke baare mein baat karni hai.";
+
+
+const url =
+"https://wa.me/" +
+number +
+"?text=" +
+encodeURIComponent(text);
+
+
+window.open(
+url,
+"_blank"
+);
+
+};
+
+}
+
+
+/* =========================
+ BACK
+========================= */
+
+document.getElementById(
+"backBtn"
+).onclick = () => {
+
+location.href =
+"student.html";
+
+};
+
+
+/* =========================
+ START
+========================= */
+
+loadData();
+
+</script>
+
+</body>
+</html>

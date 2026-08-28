@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Fees Check</title>
+
+<style>
+*{
+ box-sizing:border-box;
+ margin:0;
+ padding:0;
+ font-family:Arial,sans-serif;
+}
+
+body{
+ background:#f5f7fb;
+ color:#172033;
+}
+
+.header{
+ height:65px;
+ background:#fff;
+ border-bottom:1px solid #e5e7eb;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+}
+
+.header h2{
+ font-size:18px;
+}
+
+.main{
+ max-width:520px;
+ margin:auto;
+ padding:20px 14px 80px;
+}
+
+.hero{
+ text-align:center;
+ padding:25px 10px;
+}
+
+.heroIcon{
+ width:75px;
+ height:75px;
+ border-radius:22px;
+ background:#eef2ff;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ margin:auto;
+ font-size:35px;
+}
+
+.hero h1{
+ font-size:22px;
+ margin-top:14px;
+}
+
+.hero p{
+ color:#64748b;
+ font-size:9px;
+ margin-top:6px;
+ line-height:1.6;
+}
+
+.searchBox{
+ background:#fff;
+ padding:15px;
+ border-radius:15px;
+ box-shadow:0 4px 18px #0000000a;
+}
+
+.label{
+ font-size:9px;
+ color:#64748b;
+ margin-bottom:7px;
+ display:block;
+}
+
+.searchRow{
+ display:flex;
+ gap:7px;
+}
+
+.searchRow input{
+ flex:1;
+ min-width:0;
+ border:1px solid #dbe1ea;
+ border-radius:10px;
+ padding:12px;
+ outline:none;
+ font-size:10px;
+}
+
+.searchRow button{
+ border:0;
+ border-radius:10px;
+ background:#4f46e5;
+ color:#fff;
+ padding:0 17px;
+ font-size:10px;
+ font-weight:bold;
+}
+
+.results{
+ margin-top:15px;
+}
+
+.classCard{
+ background:#fff;
+ padding:14px;
+ border-radius:13px;
+ margin-top:8px;
+ box-shadow:0 3px 15px #00000008;
+ display:flex;
+ align-items:center;
+ gap:11px;
+ cursor:pointer;
+}
+
+.classLogo{
+ width:45px;
+ height:45px;
+ border-radius:12px;
+ background:#eef2ff;
+ color:#4f46e5;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-weight:bold;
+ font-size:17px;
+}
+
+.classInfo{
+ flex:1;
+ min-width:0;
+}
+
+.classInfo h3{
+ font-size:11px;
+ white-space:nowrap;
+ overflow:hidden;
+ text-overflow:ellipsis;
+}
+
+.classInfo p{
+ color:#64748b;
+ font-size:8px;
+ margin-top:4px;
+}
+
+.arrow{
+ font-size:18px;
+ color:#94a3b8;
+}
+
+.empty{
+ text-align:center;
+ padding:25px;
+ color:#94a3b8;
+ font-size:9px;
+ background:#fff;
+ border-radius:13px;
+}
+
+.loading{
+ text-align:center;
+ padding:25px;
+ color:#64748b;
+ font-size:9px;
+}
+
+.error{
+ text-align:center;
+ padding:20px;
+ color:#dc2626;
+ font-size:9px;
+ background:#fff;
+ border-radius:13px;
+ line-height:1.7;
+}
+
+.ad{
+ min-height:60px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ overflow:hidden;
+ margin-top:18px;
+}
+
+.footer{
+ text-align:center;
+ color:#94a3b8;
+ font-size:8px;
+ margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+<h2>🎓 Fees Check</h2>
+</header>
+
+
+<main class="main">
+
+<section class="hero">
+
+<div class="heroIcon">
+🎓
+</div>
+
+<h1>
+Check Your Fees
+</h1>
+
+<p>
+Apni coaching class search karein aur<br>
+apni fees details aasani se check karein.
+</p>
+
+</section>
+
+
+<div class="searchBox">
+
+<label class="label">
+Class Name
+</label>
+
+<div class="searchRow">
+
+<input
+id="classSearch"
+type="search"
+placeholder="Class ka naam likhein..."
+autocomplete="off">
+
+<button id="searchBtn">
+Search
+</button>
+
+</div>
+
+</div>
+
+
+<div
+class="results"
+id="results">
+
+</div>
+
+
+<div class="ad">
+
+<script>
+atOptions = {
+'key' : '635d4ad3bf4bbbc0e74b26c08d4f41ad',
+'format' : 'iframe',
+'height' : 50,
+'width' : 320,
+'params' : {}
+};
+</script>
+
+<script src="https://www.highrevenueformat.com/635d4ad3bf4bbbc0e74b26c08d4f41ad/invoke.js"></script>
+
+</div>
+
+
+<div class="footer">
+Fees Management System
+</div>
+
+</main>
+
+
+<script type="module">
+
+import {
+ initializeApp
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+ getDatabase,
+ ref,
+ get
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+/* =========================
+   FIREBASE
+========================= */
+
+const firebaseConfig={
+
+apiKey:
+"AIzaSyB4jh232r8NiNn3Z76pjsqZdJhOJjw5aN0",
+
+authDomain:
+"rajwada-coaching-classes.firebaseapp.com",
+
+databaseURL:
+"https://rajwada-coaching-classes-default-rtdb.firebaseio.com",
+
+projectId:
+"rajwada-coaching-classes",
+
+storageBucket:
+"rajwada-coaching-classes.firebasestorage.app",
+
+messagingSenderId:
+"370606048179",
+
+appId:
+"1:370606048179:web:89c5f886ec35f1971c01c6",
+
+measurementId:
+"G-4XL4VCPY1W"
+
+};
+
+
+const app=
+initializeApp(
+firebaseConfig
+);
+
+const db=
+getDatabase(app);
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const input=
+document.getElementById(
+"classSearch"
+);
+
+const button=
+document.getElementById(
+"searchBtn"
+);
+
+const results=
+document.getElementById(
+"results"
+);
+
+
+/* =========================
+   SAFE
+========================= */
+
+function safe(value){
+
+return String(
+value??""
+)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+async function searchClasses(){
+
+const text=
+input.value
+.trim()
+.toLowerCase();
+
+
+if(!text){
+
+results.innerHTML=`
+
+<div class="empty">
+🔍 Class ka naam enter karein.
+</div>
+
+`;
+
+return;
+
+}
+
+
+button.disabled=true;
+button.textContent="Searching...";
+
+
+results.innerHTML=`
+
+<div class="loading">
+🔎 Classes search ho rahi hain...
+</div>
+
+`;
+
+
+try{
+
+const snapshot=
+await get(
+ref(db,"classes")
+);
+
+
+if(!snapshot.exists()){
+
+results.innerHTML=`
+
+<div class="empty">
+😔 Abhi koi class available nahi hai.
+</div>
+
+`;
+
+button.disabled=false;
+button.textContent="Search";
+
+return;
+
+}
+
+
+const classes=
+snapshot.val();
+
+const found=[];
+
+
+Object.entries(classes)
+.forEach(
+([id,data])=>{
+
+const profile=
+data.profile||data;
+
+
+const name=
+profile.className||
+profile.name||
+"";
+
+
+if(
+name
+.toLowerCase()
+.includes(text)
+){
+
+found.push({
+
+id:id,
+
+name:name,
+
+owner:
+profile.ownerName||
+profile.owner||
+"",
+
+mobile:
+profile.mobile||
+profile.phone||
+"",
+
+address:
+profile.address||
+""
+
+});
+
+}
+
+});
+
+
+if(!found.length){
+
+results.innerHTML=`
+
+<div class="empty">
+
+😔 Class nahi mili.
+
+<br><br>
+
+Class ka naam dobara check karein.
+
+</div>
+
+`;
+
+button.disabled=false;
+button.textContent="Search";
+
+return;
+
+}
+
+
+/* =========================
+   RESULTS
+========================= */
+
+results.innerHTML=
+found
+.map(
+item=>`
+
+<div
+class="classCard"
+data-id="${safe(item.id)}">
+
+<div class="classLogo">
+
+${safe(
+item.name
+.charAt(0)
+.toUpperCase()
+)}
+
+</div>
+
+<div class="classInfo">
+
+<h3>
+${safe(item.name)}
+</h3>
+
+<p>
+${
+item.owner
+?
+"👤 "+safe(item.owner)
+:
+"Coaching Class"
+}
+</p>
+
+</div>
+
+<div class="arrow">
+›
+</div>
+
+</div>
+
+`
+)
+.join("");
+
+
+/* =========================
+   CLICK
+========================= */
+
+document
+.querySelectorAll(".classCard")
+.forEach(
+card=>{
+
+card.onclick=()=>{
+
+const id=
+card.dataset.id;
+
+
+localStorage.setItem(
+"studentClassId",
+id
+);
+
+
+const selected=
+found.find(
+x=>x.id===id
+);
+
+
+if(selected){
+
+localStorage.setItem(
+"studentClassName",
+selected.name
+);
+
+localStorage.setItem(
+"studentClassMobile",
+selected.mobile
+);
+
+}
+
+
+/*
+  Next page:
+  Student Name Search
+*/
+
+location.href=
+"student.html";
+
+};
+
+});
+
+
+}catch(error){
+
+console.error(error);
+
+results.innerHTML=`
+
+<div class="error">
+
+❌ Search failed.
+
+<br>
+
+${safe(error.message)}
+
+</div>
+
+`;
+
+}
+
+
+button.disabled=false;
+button.textContent="Search";
+
+}
+
+
+/* =========================
+   EVENTS
+========================= */
+
+button.onclick=
+searchClasses;
+
+
+input.addEventListener(
+"keydown",
+event=>{
+
+if(
+event.key==="Enter"
+){
+
+searchClasses();
+
+}
+
+});
+
+
+/* =========================
+   START
+========================= */
+
+results.innerHTML=`
+
+<div class="empty">
+
+🔍 Upar apni class ka naam search karein.
+
+</div>
+
+`;
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Find Student</title>
+
+<style>
+*{
+ box-sizing:border-box;
+ margin:0;
+ padding:0;
+ font-family:Arial,sans-serif
+}
+
+body{
+ background:#f5f7fb;
+ color:#172033
+}
+
+.header{
+ height:64px;
+ background:#fff;
+ border-bottom:1px solid #e5e7eb;
+ display:flex;
+ align-items:center;
+ gap:10px;
+ padding:0 14px;
+ position:sticky;
+ top:0;
+ z-index:10
+}
+
+.back{
+ width:38px;
+ height:38px;
+ border:0;
+ border-radius:10px;
+ background:#eef2ff;
+ color:#4f46e5;
+ font-size:22px
+}
+
+.header h2{
+ font-size:16px
+}
+
+.main{
+ max-width:520px;
+ margin:auto;
+ padding:20px 14px 80px
+}
+
+.className{
+ text-align:center;
+ margin:10px 0 20px
+}
+
+.classIcon{
+ width:65px;
+ height:65px;
+ margin:auto;
+ border-radius:19px;
+ background:#eef2ff;
+ color:#4f46e5;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:29px;
+ font-weight:bold
+}
+
+.className h1{
+ font-size:18px;
+ margin-top:10px
+}
+
+.className p{
+ color:#64748b;
+ font-size:8px;
+ margin-top:4px
+}
+
+.searchBox{
+ background:#fff;
+ padding:15px;
+ border-radius:15px;
+ box-shadow:0 4px 18px #00000008
+}
+
+.label{
+ display:block;
+ color:#64748b;
+ font-size:9px;
+ margin-bottom:7px
+}
+
+.row{
+ display:flex;
+ gap:7px
+}
+
+.row input{
+ flex:1;
+ min-width:0;
+ border:1px solid #dbe1ea;
+ border-radius:10px;
+ padding:12px;
+ font-size:10px;
+ outline:none
+}
+
+.row button{
+ border:0;
+ border-radius:10px;
+ padding:0 16px;
+ background:#4f46e5;
+ color:#fff;
+ font-size:10px;
+ font-weight:bold
+}
+
+.results{
+ margin-top:15px
+}
+
+.student{
+ background:#fff;
+ padding:13px;
+ border-radius:13px;
+ margin-top:8px;
+ display:flex;
+ align-items:center;
+ gap:10px;
+ box-shadow:0 3px 15px #00000008;
+ cursor:pointer
+}
+
+.avatar{
+ width:43px;
+ height:43px;
+ border-radius:12px;
+ background:#eef2ff;
+ color:#4f46e5;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:16px;
+ font-weight:bold
+}
+
+.info{
+ flex:1;
+ min-width:0
+}
+
+.info h3{
+ font-size:10px;
+ white-space:nowrap;
+ overflow:hidden;
+ text-overflow:ellipsis
+}
+
+.info p{
+ color:#64748b;
+ font-size:8px;
+ margin-top:4px
+}
+
+.arrow{
+ color:#94a3b8;
+ font-size:18px
+}
+
+.empty{
+ background:#fff;
+ padding:25px;
+ border-radius:13px;
+ text-align:center;
+ color:#94a3b8;
+ font-size:9px;
+ line-height:1.7
+}
+
+.loading{
+ text-align:center;
+ padding:25px;
+ color:#64748b;
+ font-size:9px
+}
+
+.error{
+ background:#fff;
+ padding:22px;
+ border-radius:13px;
+ color:#dc2626;
+ text-align:center;
+ font-size:9px;
+ line-height:1.7
+}
+
+.ad{
+ min-height:60px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ overflow:hidden;
+ margin-top:18px
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+<button class="back" id="backBtn">
+‹
+</button>
+
+<h2>👨‍🎓 Find Student</h2>
+
+</header>
+
+
+<main class="main">
+
+<section class="className">
+
+<div class="classIcon" id="classIcon">
+C
+</div>
+
+<h1 id="classTitle">
+Loading...
+</h1>
+
+<p>
+Apna naam search karein
+</p>
+
+</section>
+
+
+<div class="searchBox">
+
+<label class="label">
+Student Name
+</label>
+
+<div class="row">
+
+<input
+id="studentSearch"
+type="search"
+placeholder="Apna naam likhein..."
+autocomplete="off">
+
+<button id="searchBtn">
+Search
+</button>
+
+</div>
+
+</div>
+
+
+<div
+class="results"
+id="results">
+
+<div class="empty">
+🔍 Apna naam search karein.
+</div>
+
+</div>
+
+
+<div class="ad">
+
+<script>
+atOptions = {
+'key' : '635d4ad3bf4bbbc0e74b26c08d4f41ad',
+'format' : 'iframe',
+'height' : 50,
+'width' : 320,
+'params' : {}
+};
+</script>
+
+<script src="https://www.highrevenueformat.com/635d4ad3bf4bbbc0e74b26c08d4f41ad/invoke.js"></script>
+
+</div>
+
+</main>
+
+
+<script type="module">
+
+import {
+initializeApp
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+get
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+/* =========================
+ FIREBASE
+========================= */
+
+const firebaseConfig={
+
+apiKey:
+"AIzaSyB4jh232r8NiNn3Z76pjsqZdJhOJjw5aN0",
+
+authDomain:
+"rajwada-coaching-classes.firebaseapp.com",
+
+databaseURL:
+"https://rajwada-coaching-classes-default-rtdb.firebaseio.com",
+
+projectId:
+"rajwada-coaching-classes",
+
+storageBucket:
+"rajwada-coaching-classes.firebasestorage.app",
+
+messagingSenderId:
+"370606048179",
+
+appId:
+"1:370606048179:web:89c5f886ec35f1971c01c6",
+
+measurementId:
+"G-4XL4VCPY1W"
+
+};
+
+
+const app=
+initializeApp(firebaseConfig);
+
+const db=
+getDatabase(app);
+
+
+/* =========================
+ ELEMENTS
+========================= */
+
+const classId=
+localStorage.getItem(
+"studentClassId"
+);
+
+const className=
+localStorage.getItem(
+"studentClassName"
+) || "Coaching Classes";
+
+const input=
+document.getElementById(
+"studentSearch"
+);
+
+const button=
+document.getElementById(
+"searchBtn"
+);
+
+const results=
+document.getElementById(
+"results"
+);
+
+
+/* =========================
+ CLASS NAME
+========================= */
+
+document.getElementById(
+"classTitle"
+).textContent=
+className;
+
+document.getElementById(
+"classIcon"
+).textContent=
+className
+.charAt(0)
+.toUpperCase();
+
+
+/* =========================
+ SAFE
+========================= */
+
+function safe(value){
+
+return String(value??"")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+
+}
+
+
+/* =========================
+ SEARCH STUDENTS
+========================= */
+
+async function searchStudents(){
+
+const query=
+input.value
+.trim()
+.toLowerCase();
+
+
+if(!query){
+
+results.innerHTML=`
+
+<div class="empty">
+🔍 Student ka naam enter karein.
+</div>
+
+`;
+
+return;
+
+}
+
+
+if(!classId){
+
+results.innerHTML=`
+
+<div class="error">
+
+❌ Class select nahi hui.
+
+<br><br>
+
+Wapas jaakar class select karein.
+
+</div>
+
+`;
+
+return;
+
+}
+
+
+button.disabled=true;
+button.textContent="Searching...";
+
+
+results.innerHTML=`
+
+<div class="loading">
+🔎 Student search ho raha hai...
+</div>
+
+`;
+
+
+try{
+
+const snapshot=
+await get(
+ref(
+db,
+"classes/"
++classId+
+"/students"
+)
+);
+
+
+if(!snapshot.exists()){
+
+results.innerHTML=`
+
+<div class="empty">
+
+😔 Is class mein abhi
+koi student nahi hai.
+
+</div>
+
+`;
+
+button.disabled=false;
+button.textContent="Search";
+
+return;
+
+}
+
+
+const students=
+snapshot.val();
+
+const found=[];
+
+
+Object.entries(students)
+.forEach(
+([id,student])=>{
+
+const name=
+student.name ||
+student.studentName ||
+"";
+
+
+if(
+name
+.toLowerCase()
+.includes(query)
+){
+
+found.push({
+
+id:id,
+
+name:name,
+
+mobile:
+student.mobile||
+student.phone||
+"",
+
+roll:
+student.rollNumber||
+student.roll||
+""
+
+});
+
+}
+
+});
+
+
+if(!found.length){
+
+results.innerHTML=`
+
+<div class="empty">
+
+😔 Student nahi mila.
+
+<br>
+
+Naam dobara check karein.
+
+</div>
+
+`;
+
+button.disabled=false;
+button.textContent="Search";
+
+return;
+
+}
+
+
+/* =========================
+ RESULTS
+========================= */
+
+results.innerHTML=
+found
+.map(
+student=>`
+
+<div
+class="student"
+data-id="${safe(student.id)}">
+
+<div class="avatar">
+
+${safe(
+student.name
+.charAt(0)
+.toUpperCase()
+)}
+
+</div>
+
+<div class="info">
+
+<h3>
+${safe(student.name)}
+</h3>
+
+<p>
+${
+student.roll
+?
+"Roll No: "+
+safe(student.roll)
+:
+"Student"
+}
+</p>
+
+</div>
+
+<div class="arrow">
+›
+</div>
+
+</div>
+
+`
+)
+.join("");
+
+
+/* =========================
+ CLICK
+========================= */
+
+document
+.querySelectorAll(".student")
+.forEach(
+card=>{
+
+card.onclick=()=>{
+
+const id=
+card.dataset.id;
+
+
+localStorage.setItem(
+"studentId",
+id
+);
+
+
+localStorage.setItem(
+"studentClassId",
+classId
+);
+
+
+location.href=
+"student-profile.html";
+
+};
+
+});
+
+
+}catch(error){
+
+console.error(
+error
+);
+
+results.innerHTML=`
+
+<div class="error">
+
+❌ Student search failed.
+
+<br><br>
+
+${safe(error.message)}
+
+</div>
+
+`;
+
+}
+
+
+button.disabled=false;
+button.textContent="Search";
+
+}
+
+
+/* =========================
+ EVENTS
+========================= */
+
+button.onclick=
+searchStudents;
+
+
+input.addEventListener(
+"keydown",
+event=>{
+
+if(
+event.key==="Enter"
+){
+
+searchStudents();
+
+}
+
+});
+
+
+document.getElementById(
+"backBtn"
+).onclick=
+()=>{
+
+location.href=
+"index.html";
+
+};
+
+</script>
+
+</body>
+</html>
